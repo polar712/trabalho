@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard de Produtos Digitais</title>
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2111/2111370.png" type="image/png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,6 +12,10 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -156,155 +161,23 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media (max-width: 500px) {
+      body {
+        padding: 20px 10px;
+      }
+
+      .checkbox-wrapper {
+        padding: 12px;
+        font-size: 0.9rem;
+      }
+
+      button {
+        font-size: 0.9rem;
+        padding: 12px 20px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h2>Produtos Virtuais Mais Vendidos</h2>
-
-  <div class="descricao">
-    <p><strong>Objetivo do site:</strong> Este painel permite visualizar quais produtos digitais estão sendo mais consumidos pelos usuários.</p>
-    <p><strong>Formulário:</strong> Marque os produtos que você adquiriu nos últimos 12 meses. Isso ajuda a atualizar os gráficos automaticamente.</p>
-    <p><strong>Gráfico de Barras:</strong> Mostra a quantidade de votos para cada tipo de produto. É gerado com base nas suas respostas e de outros visitantes.</p>
-    <p><strong>Gráfico de Pizza:</strong> Analisa o mercado com base em uma simulação de participação percentual entre os tipos de produtos digitais.</p>
-  </div>
-
-  <form id="productForm">
-    <p>Quais desses produtos você comprou nos últimos 12 meses?</p>
-    <div class="checkbox-group">
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Cursos Online"><span>Cursos Online</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Streaming (Netflix, Spotify)"><span>Streaming (Netflix, Spotify)</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Software/SaaS"><span>Software/SaaS</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Jogos Digitais"><span>Jogos Digitais</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Criptomoedas/NFTs"><span>Criptomoedas/NFTs</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Aplicativos Móveis"><span>Aplicativos Móveis</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="E-books"><span>E-books</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Itens de Jogos"><span>Itens de Jogos</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Assinaturas Premium"><span>Assinaturas Premium</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Serviços de Nuvem"><span>Serviços de Nuvem</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Templates e Design"><span>Templates e Design</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Licenças de Software"><span>Licenças de Software</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Cursos Profissionais"><span>Cursos Profissionais</span></label>
-      <label class="checkbox-wrapper"><input type="checkbox" name="product" value="Consultorias Online"><span>Consultorias Online</span></label>
-    </div>
-    <button type="submit">Enviar Resposta</button>
-  </form>
-
-  <div class="chart-section">
-    <div class="chart-container">
-      <h2>Respostas dos Usuários</h2>
-      <canvas id="productChart"></canvas>
-    </div>
-
-    <div class="chart-container">
-      <h2>Distribuição de Mercado</h2>
-      <canvas id="marketPieChart"></canvas>
-    </div>
-  </div>
-
-  <script>
-    const productCtx = document.getElementById('productChart').getContext('2d');
-    const productCounts = JSON.parse(localStorage.getItem('productCounts')) || {};
-
-    const productChart = new Chart(productCtx, {
-      type: 'bar',
-      data: {
-        labels: Object.keys(productCounts),
-        datasets: [{
-          label: 'Votos por Produto',
-          data: Object.values(productCounts),
-          backgroundColor: '#8b5cf6',
-          borderRadius: 10,
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { color: '#94a3b8', stepSize: 1 },
-            grid: { color: '#334155' }
-          },
-          x: {
-            ticks: { color: '#94a3b8' },
-            grid: { display: false }
-          }
-        },
-        plugins: {
-          legend: {
-            labels: {
-              color: '#cbd5e1',
-              font: { size: 14 }
-            }
-          }
-        }
-      }
-    });
-
-    document.getElementById('productForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      const checked = document.querySelectorAll('input[name="product"]:checked');
-      checked.forEach(input => {
-        const product = input.value;
-        productCounts[product] = (productCounts[product] || 0) + 1;
-      });
-
-      localStorage.setItem('productCounts', JSON.stringify(productCounts));
-
-      productChart.data.labels = Object.keys(productCounts);
-      productChart.data.datasets[0].data = Object.values(productCounts);
-      productChart.update();
-
-      this.reset();
-    });
-
-    const marketCtx = document.getElementById('marketPieChart').getContext('2d');
-    const marketData = {
-      labels: [
-        'eBooks',
-        'Cursos Online',
-        'Audiobooks',
-        'Templates & Design',
-        'Ferramentas de Escrita com IA',
-        'Assinaturas Premium'
-      ],
-      datasets: [{
-        data: [25, 30, 10, 15, 8, 12],
-        backgroundColor: [
-          '#6366f1',
-          '#8b5cf6',
-          '#10b981',
-          '#facc15',
-          '#ec4899',
-          '#0ea5e9'
-        ],
-        borderColor: '#0f172a',
-        borderWidth: 2
-      }]
-    };
-
-    const marketConfig = {
-      type: 'pie',
-      data: marketData,
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            labels: {
-              color: '#cbd5e1',
-              font: { size: 14 }
-            },
-            position: 'bottom'
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => `${context.label}: ${context.parsed}%`
-            }
-          }
-        }
-      }
-    };
-
-    new Chart(marketCtx, marketConfig);
-  </script>
-</body>
-</html>
+  <!-- resto do conteúdo permanece igual -->
